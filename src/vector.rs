@@ -119,4 +119,8 @@ impl Vector3 {
       z: 0.0
     };
   }
+
+  pub fn dot(&self, vec: Vector3) -> f64 {
+    return self.x * vec.x + self.y * vec.y + self.z * vec.z;
+  }
 }

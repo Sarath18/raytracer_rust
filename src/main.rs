@@ -3,14 +3,25 @@ mod camera;
 mod ray;
 mod scene;
 mod vector;
+mod sphere;
 
 use camera::{Camera, ImageInfo};
 use scene::Scene;
 use image::{DynamicImage, GenericImage, Pixel, Rgba};
 use vector::Vector3;
 use ray::Ray;
+use sphere::Sphere;
 
 pub fn ray_color(ray: &Ray) -> Vector3 {
+  let sphere = Sphere {
+    center: Vector3{x: 0.0, y: 0.0, z: -1.0},
+    radius: 0.5
+  };
+
+  if sphere.hit_sphere(ray) {
+    return Vector3{x: 1.0, y: 0.0, z: 0.0};
+  }
+
   let unit_direction = Vector3::unit_vector(ray.direction);
   let t = 0.5 * unit_direction.y + 1.0;
   return (1.0 - t) * Vector3::from_one(1.0) + t * Vector3{x: 0.5, y: 0.7, z: 1.0};
