@@ -18,8 +18,10 @@ pub fn ray_color(ray: &Ray) -> Vector3 {
     radius: 0.5
   };
 
-  if sphere.hit_sphere(ray) {
-    return Vector3{x: 1.0, y: 0.0, z: 0.0};
+  let t = sphere.hit_sphere(ray);
+  if t > 0.0 {
+    let n = Vector3::unit_vector(ray.at(t) - Vector3{x: 0.0, y: 0.0, z:-1.0});
+    return 0.5 * Vector3{x: n.x + 1.0, y: n.y + 1.0, z: n.z + 1.0};
   }
 
   let unit_direction = Vector3::unit_vector(ray.direction);

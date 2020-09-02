@@ -7,7 +7,7 @@ pub struct Ray {
 }
 
 impl Ray {
-  fn at(&self, t: f64) -> Vector3 {
+  pub fn at(&self, t: f64) -> Vector3 {
     return self.origin + t * self.direction;
   }
 }

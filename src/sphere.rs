@@ -8,12 +8,18 @@ pub struct Sphere {
 }
 
 impl Sphere {
-  pub fn hit_sphere(&self, ray: &Ray) -> bool {
+  pub fn hit_sphere(&self, ray: &Ray) -> f64 {
     let oc = ray.origin - self.center;
+
     let a = ray.direction.dot(ray.direction);
     let b = 2.0 * oc.dot(ray.direction);
     let c = oc.dot(oc) - self.radius * self.radius;
+
     let discriminant = (b * b) - (4.0 * a * c);
-    return discriminant > 0.0;
+    if discriminant < 0.0 {
+      return -1.0;
+    } else {
+      return (-b - discriminant.sqrt()) / (2.0 * a);
+    }
   }
 }
