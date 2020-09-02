@@ -10,7 +10,7 @@ use scene::Scene;
 use image::{DynamicImage, GenericImage, Pixel, Rgba};
 use vector::Vector3;
 use ray::Ray;
-use sphere::Sphere;
+use sphere::{HitRecord, Sphere};
 
 pub fn ray_color(ray: &Ray) -> Vector3 {
   let sphere = Sphere {
@@ -18,10 +18,9 @@ pub fn ray_color(ray: &Ray) -> Vector3 {
     radius: 0.5
   };
 
-  let t = sphere.hit_sphere(ray);
-  if t > 0.0 {
-    let n = Vector3::unit_vector(ray.at(t) - Vector3{x: 0.0, y: 0.0, z:-1.0});
-    return 0.5 * Vector3{x: n.x + 1.0, y: n.y + 1.0, z: n.z + 1.0};
+  let mut rec = HitRecord {p: Vector3::zero(), normal: Vector3::zero(), t: 0.0};
+  if sphere.hit(ray, 0.0, 100.0, &mut rec) {
+    return 0.5 * Vector3{x: rec.normal.x + 1.0, y: rec.normal.y + 1.0, z: rec.normal.z + 1.0};
   }
 
   let unit_direction = Vector3::unit_vector(ray.direction);
