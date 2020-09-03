@@ -5,6 +5,7 @@ mod scene;
 mod vector;
 mod sphere;
 
+use rand::Rng;
 use camera::{Camera, ImageInfo};
 use scene::{Scene, World};
 use image::{DynamicImage, GenericImage, Pixel, Rgba};
@@ -24,25 +25,39 @@ pub fn ray_color(ray: &Ray, world: &World) -> Vector3 {
   return (1.0 - t) * Vector3::from_one(1.0) + t * Vector3{x: 0.5, y: 0.7, z: 1.0};
 }
 
+pub fn clamp(x: f64, min: f64, max: f64) -> f64 {
+  return if x < min { min } else { if x > max { max } else { x } }
+}
+
 pub fn render(scene: &Scene) -> DynamicImage {
   let mut image = DynamicImage::new_rgb8(scene.image_info.width, scene.image_info.height);
 
+  let mut rng = rand::thread_rng();
+
   for y in 0..scene.image_info.height {
     for x in 0..scene.image_info.width {
-      let u = x as f64 / scene.image_info.width as f64;
-      let v = y as f64 / scene.image_info.height as f64;
+      let mut pixel_color = Vector3::zero();
 
-      let ray = Ray {
-        origin: scene.camera.origin,
-        direction: scene.camera.lower_left_corner + u * scene.camera.horizonal + v * scene.camera.vertical - scene.camera.origin
-      };
+      for _ in 0..scene.image_info.samples_per_pixel {
+        let u = (x as f64 + rng.gen::<f64>()) / scene.image_info.width as f64;
+        let v = (y as f64 + rng.gen::<f64>()) / scene.image_info.height as f64;
 
-      let color_vec = ray_color(&ray, &scene.world);
+        let ray = scene.camera.get_ray(&u, &v);
+
+        let mut color_vec = ray_color(&ray, &scene.world);
+
+        let scale = 1.0 / (scene.image_info.samples_per_pixel as f64);
+        color_vec.x = color_vec.x * scale;
+        color_vec.y = color_vec.y * scale;
+        color_vec.z = color_vec.z * scale;
+
+        pixel_color = pixel_color + color_vec;
+      }
 
       let color = Rgba::from_channels(
-        (color_vec.x * 255.0) as u8,
-        (color_vec.y * 255.0) as u8,
-        (color_vec.z * 255.0) as u8,
+        (clamp(pixel_color.x, 0.0, 0.9999) * 256.0) as u8,
+        (clamp(pixel_color.y, 0.0, 0.9999) * 256.0) as u8,
+        (clamp(pixel_color.z, 0.0, 0.9999) * 256.0) as u8,
         255 as u8
       );
 
@@ -57,7 +72,8 @@ fn main() {
   let image_info = ImageInfo {
     aspect_ratio: 16.0 / 9.0,
     width: 400,
-    height: 225
+    height: 225,
+    samples_per_pixel: 100
   };
 
   // Camera

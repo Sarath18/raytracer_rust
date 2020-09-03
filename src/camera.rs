@@ -1,10 +1,12 @@
 use crate::vector::Vector3;
+use crate::ray::Ray;
 
 #[derive(Copy, Clone, Debug)]
 pub struct ImageInfo {
   pub aspect_ratio: f64,
   pub height: u32,
-  pub width: u32
+  pub width: u32,
+  pub samples_per_pixel: u32
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -29,5 +31,12 @@ impl Camera {
       vertical: Vector3::zero(),
       lower_left_corner: Vector3::zero()
     }
+  }
+
+  pub fn get_ray(&self, u: &f64, v: &f64) -> Ray {
+    return Ray {
+      origin: self.origin,
+      direction: self.lower_left_corner + *u * self.horizonal + *v * self.vertical - self.origin
+    };
   }
 }
