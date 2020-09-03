@@ -21,7 +21,7 @@ pub fn ray_color(ray: &Ray, world: &World, depth: i32) -> Vector3 {
 
   let mut rec = HitRecord::init();
   if world.hit(ray, 0.001, std::f64::INFINITY, &mut rec) {
-    let target = rec.p + rec.normal + Vector3::random_in_unit_sphere();
+    let target = rec.p + rec.normal + Vector3::random_unit_vector();
     return 0.5 * ray_color(&Ray{origin: rec.p, direction: target - rec.p}, world, depth - 1);
   }
 
