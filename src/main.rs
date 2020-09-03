@@ -6,21 +6,17 @@ mod vector;
 mod sphere;
 
 use camera::{Camera, ImageInfo};
-use scene::Scene;
+use scene::{Scene, World};
 use image::{DynamicImage, GenericImage, Pixel, Rgba};
 use vector::Vector3;
 use ray::Ray;
 use sphere::{HitRecord, Sphere};
 
-pub fn ray_color(ray: &Ray) -> Vector3 {
-  let sphere = Sphere {
-    center: Vector3{x: 0.0, y: 0.0, z: -1.0},
-    radius: 0.5
-  };
+pub fn ray_color(ray: &Ray, world: &World) -> Vector3 {
 
   let mut rec = HitRecord::init();
-  if sphere.hit(ray, 0.0, 100.0, &mut rec) {
-    return 0.5 * Vector3{x: rec.normal.x + 1.0, y: rec.normal.y + 1.0, z: rec.normal.z + 1.0};
+  if world.hit(ray, 0.0, std::f64::INFINITY, &mut rec) {
+    return 0.5 * (Vector3{x: rec.normal.x, y: rec.normal.y, z: rec.normal.z} + Vector3::from_one(1.0));
   }
 
   let unit_direction = Vector3::unit_vector(ray.direction);
@@ -41,7 +37,7 @@ pub fn render(scene: &Scene) -> DynamicImage {
         direction: scene.camera.lower_left_corner + u * scene.camera.horizonal + v * scene.camera.vertical - scene.camera.origin
       };
 
-      let color_vec = ray_color(&ray);
+      let color_vec = ray_color(&ray, &scene.world);
 
       let color = Rgba::from_channels(
         (color_vec.x * 255.0) as u8,
@@ -73,10 +69,22 @@ fn main() {
   camera.vertical = Vector3{x: 0.0, y: camera.viewport_height, z: 0.0};
   camera.lower_left_corner = camera.origin - camera.horizonal/2.0 - camera.vertical/2.0 - Vector3{x: 0.0, y: 0.0, z: camera.focal_length};
 
+  let spheres = vec![
+    Sphere {
+      center: Vector3{x: 0.0, y: 0.0, z: -1.0},
+      radius: 0.5
+    },
+    Sphere {
+      center: Vector3{x: 0.0, y: -100.5, z: -1.0},
+      radius: 100.0
+    },
+  ];
+
   // Scene
   let scene = Scene {
     image_info: image_info,
-    camera: camera
+    camera: camera,
+    world: World{spheres: spheres}
   };
 
   // Render
