@@ -5,7 +5,24 @@ use crate::ray::Ray;
 pub struct HitRecord {
   pub p: Vector3,
   pub normal: Vector3,
-  pub t: f64
+  pub t: f64,
+  pub front_face: bool
+}
+
+impl HitRecord {
+  pub fn init() -> Self {
+    Self {
+      p: Vector3::zero(),
+      normal: Vector3::zero(),
+      t: 0.0,
+      front_face: false
+    }
+  }
+
+  pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: Vector3) {
+    self.front_face = ray.direction.dot(outward_normal) < 0.0;
+    self.normal = if self.front_face { outward_normal } else { -outward_normal }
+  }
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -30,7 +47,8 @@ impl Sphere {
       if temp < t_max && temp > t_min {
         rec.t = temp;
         rec.p = ray.at(rec.t);
-        rec.normal = (rec.p - self.center) / self.radius;
+        let outward_normal = (rec.p - self.center) / self.radius;
+        rec.set_face_normal(ray, outward_normal);
         return true;
       }
 
@@ -38,7 +56,8 @@ impl Sphere {
       if temp < t_max && temp > t_min {
         rec.t = temp;
         rec.p = ray.at(rec.t);
-        rec.normal = (rec.p - self.center) / self.radius;
+        let outward_normal = (rec.p - self.center) / self.radius;
+        rec.set_face_normal(ray, outward_normal);
         return true;
       }
     }

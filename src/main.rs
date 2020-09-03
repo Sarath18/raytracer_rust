@@ -18,7 +18,7 @@ pub fn ray_color(ray: &Ray) -> Vector3 {
     radius: 0.5
   };
 
-  let mut rec = HitRecord {p: Vector3::zero(), normal: Vector3::zero(), t: 0.0};
+  let mut rec = HitRecord::init();
   if sphere.hit(ray, 0.0, 100.0, &mut rec) {
     return 0.5 * Vector3{x: rec.normal.x + 1.0, y: rec.normal.y + 1.0, z: rec.normal.z + 1.0};
   }
