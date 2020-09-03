@@ -20,7 +20,7 @@ pub fn ray_color(ray: &Ray, world: &World, depth: i32) -> Vector3 {
   }
 
   let mut rec = HitRecord::init();
-  if world.hit(ray, 0.0, std::f64::INFINITY, &mut rec) {
+  if world.hit(ray, 0.001, std::f64::INFINITY, &mut rec) {
     let target = rec.p + rec.normal + Vector3::random_in_unit_sphere();
     return 0.5 * ray_color(&Ray{origin: rec.p, direction: target - rec.p}, world, depth - 1);
   }
@@ -60,13 +60,14 @@ pub fn render(scene: &Scene) -> DynamicImage {
       }
 
       let color = Rgba::from_channels(
-        (clamp(pixel_color.x, 0.0, 0.9999) * 256.0) as u8,
-        (clamp(pixel_color.y, 0.0, 0.9999) * 256.0) as u8,
-        (clamp(pixel_color.z, 0.0, 0.9999) * 256.0) as u8,
+        (clamp(pixel_color.x, 0.0, 0.9999).sqrt() * 256.0) as u8,
+        (clamp(pixel_color.y, 0.0, 0.9999).sqrt() * 256.0) as u8,
+        (clamp(pixel_color.z, 0.0, 0.9999).sqrt() * 256.0) as u8,
         255 as u8
       );
 
       image.put_pixel(x, scene.image_info.height -1 - y, color);
+      print!("Completed: {:.3}%\t\t\t\r", ((x + y * scene.image_info.width) as f64 / (scene.image_info.height * scene.image_info.width) as f64) * 100.0);
     }
   }
   return image;
