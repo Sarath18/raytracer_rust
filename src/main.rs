@@ -13,11 +13,16 @@ use vector::Vector3;
 use ray::Ray;
 use sphere::{HitRecord, Sphere};
 
-pub fn ray_color(ray: &Ray, world: &World) -> Vector3 {
+pub fn ray_color(ray: &Ray, world: &World, depth: i32) -> Vector3 {
+
+  if depth <= 0 {
+    return Vector3::zero();
+  }
 
   let mut rec = HitRecord::init();
   if world.hit(ray, 0.0, std::f64::INFINITY, &mut rec) {
-    return 0.5 * (Vector3{x: rec.normal.x, y: rec.normal.y, z: rec.normal.z} + Vector3::from_one(1.0));
+    let target = rec.p + rec.normal + Vector3::random_in_unit_sphere();
+    return 0.5 * ray_color(&Ray{origin: rec.p, direction: target - rec.p}, world, depth - 1);
   }
 
   let unit_direction = Vector3::unit_vector(ray.direction);
@@ -44,7 +49,7 @@ pub fn render(scene: &Scene) -> DynamicImage {
 
         let ray = scene.camera.get_ray(&u, &v);
 
-        let mut color_vec = ray_color(&ray, &scene.world);
+        let mut color_vec = ray_color(&ray, &scene.world, scene.image_info.max_depth);
 
         let scale = 1.0 / (scene.image_info.samples_per_pixel as f64);
         color_vec.x = color_vec.x * scale;
@@ -73,7 +78,8 @@ fn main() {
     aspect_ratio: 16.0 / 9.0,
     width: 400,
     height: 225,
-    samples_per_pixel: 100
+    samples_per_pixel: 100,
+    max_depth: 50
   };
 
   // Camera

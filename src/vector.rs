@@ -1,4 +1,5 @@
 use std::ops::{Add, Sub, Neg, Mul, Div};
+use rand::Rng;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Vector3 {
@@ -122,5 +123,33 @@ impl Vector3 {
 
   pub fn dot(&self, vec: Vector3) -> f64 {
     return self.x * vec.x + self.y * vec.y + self.z * vec.z;
+  }
+
+  pub fn random() -> Vector3 {
+    let mut rng = rand::thread_rng();
+    return Vector3 {
+      x: rng.gen::<f64>(),
+      y: rng.gen::<f64>(),
+      z: rng.gen::<f64>()
+    }
+  }
+
+  pub fn random_range(min: f64, max: f64) -> Vector3 {
+    let mut rng = rand::thread_rng();
+    return Vector3 {
+      x: rng.gen_range(min, max),
+      y: rng.gen_range(min, max),
+      z: rng.gen_range(min, max)
+    };
+  }
+
+  pub fn random_in_unit_sphere() -> Vector3 {
+    loop{
+      let p = Vector3::random_range(-1.0, 1.0);
+      if p.norm() >= 1.0 {
+        continue;
+      }
+      return p;
+    }
   }
 }

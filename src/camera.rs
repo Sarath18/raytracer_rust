@@ -6,7 +6,8 @@ pub struct ImageInfo {
   pub aspect_ratio: f64,
   pub height: u32,
   pub width: u32,
-  pub samples_per_pixel: u32
+  pub samples_per_pixel: u32,
+  pub max_depth: i32
 }
 
 #[derive(Copy, Clone, Debug)]
