@@ -57,6 +57,17 @@ impl Material {
         let etai_over_etat = if rec.front_face { 1.0 / ref_idx } else { ref_idx };
 
         let unit_direction = Vector3::unit_vector(ray.direction);
+
+        let mut cos_theta = -unit_direction.dot(rec.normal);
+        cos_theta = if cos_theta < 1.0 { cos_theta } else { 1.0 };
+        let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+
+        if etai_over_etat * sin_theta > 1.0 {
+          let reflected = reflect(unit_direction, rec.normal);
+          *scattered = Ray{origin: rec.p, direction: reflected};
+          return true;
+        }
+
         let refracted = refract(unit_direction, rec.normal, etai_over_etat);
         *scattered = Ray{origin: rec.p, direction: refracted};
         return true;

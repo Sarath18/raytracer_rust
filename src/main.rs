@@ -105,7 +105,7 @@ fn main() {
     Sphere {
       center: Vector3{x: 0.0, y: 0.0, z: -1.0},
       radius: 0.5,
-      mat: Material { albedo: Vector3::zero(), surface: SurfaceType::Refractive{ ref_idx: 1.5 } }
+      mat: Material { albedo: Vector3{x: 0.1, y: 0.2, z: 0.5}, surface: SurfaceType::Diffuse }
     },
     // Ground
     Sphere {
@@ -123,7 +123,7 @@ fn main() {
     Sphere {
       center: Vector3{x: 1.0, y: 0.0, z: -1.0},
       radius: 0.5,
-      mat: Material { albedo: Vector3{x: 0.8, y: 0.6, z: 0.2}, surface: SurfaceType::Reflective{ fuzz: 1.0} }
+      mat: Material { albedo: Vector3{x: 0.8, y: 0.6, z: 0.2}, surface: SurfaceType::Reflective{ fuzz: 0.0 } }
     },
   ];
 
