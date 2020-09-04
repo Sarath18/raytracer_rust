@@ -13,7 +13,7 @@ use image::{DynamicImage, GenericImage, Pixel, Rgba};
 use vector::Vector3;
 use ray::Ray;
 use sphere::{HitRecord, Sphere};
-use material::Material;
+use material::{Material, SurfaceType};
 
 pub fn ray_color(ray: &Ray, world: &World, depth: i32) -> Vector3 {
 
@@ -74,7 +74,7 @@ pub fn render(scene: &Scene) -> DynamicImage {
       );
 
       image.put_pixel(x, scene.image_info.height -1 - y, color);
-      print!("Completed: {:.3}%\r", ((x + y * scene.image_info.width) as f64 / (scene.image_info.height * scene.image_info.width) as f64) * 100.0);
+      print!("Completed: {:.3}%\r", ((1 + x + y * scene.image_info.width) as f64 / (scene.image_info.height * scene.image_info.width) as f64) * 100.0);
     }
   }
   println!();
@@ -104,12 +104,22 @@ fn main() {
     Sphere {
       center: Vector3{x: 0.0, y: 0.0, z: -1.0},
       radius: 0.5,
-      mat: Material { albedo: Vector3{x: 0.7, y: 0.3, z: 0.3} }
+      mat: Material { albedo: Vector3{x: 0.7, y: 0.3, z: 0.3}, surface: SurfaceType::Diffuse }
     },
     Sphere {
       center: Vector3{x: 0.0, y: -100.5, z: -1.0},
       radius: 100.0,
-      mat: Material { albedo: Vector3{x: 0.8, y: 0.8, z: 0.0} }
+      mat: Material { albedo: Vector3{x: 0.8, y: 0.8, z: 0.0}, surface: SurfaceType::Diffuse }
+    },
+    Sphere {
+      center: Vector3{x: -1.0, y: 0.0, z: -1.0},
+      radius: 0.5,
+      mat: Material { albedo: Vector3{x: 0.8, y: 0.8, z: 0.8}, surface: SurfaceType::Reflective }
+    },
+    Sphere {
+      center: Vector3{x: 1.0, y: 0.0, z: -1.0},
+      radius: 0.5,
+      mat: Material { albedo: Vector3{x: 0.8, y: 0.6, z: 0.2}, surface: SurfaceType::Reflective }
     },
   ];
 

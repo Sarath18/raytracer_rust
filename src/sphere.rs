@@ -17,7 +17,7 @@ impl HitRecord {
       normal: Vector3::zero(),
       t: 0.0,
       front_face: false,
-      mat: Material{albedo: Vector3::zero()}
+      mat: Material::init()
     }
   }
 
