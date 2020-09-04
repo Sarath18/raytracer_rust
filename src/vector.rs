@@ -115,14 +115,22 @@ impl Vector3 {
 
   pub fn zero() -> Vector3 {
     return Vector3 {
-      x: 0.0, 
-      y: 0.0, 
+      x: 0.0,
+      y: 0.0,
       z: 0.0
     };
   }
 
   pub fn dot(&self, vec: Vector3) -> f64 {
     return self.x * vec.x + self.y * vec.y + self.z * vec.z;
+  }
+
+  pub fn cross(&self, vec: Vector3) -> Vector3 {
+    return Vector3 {
+      x: self.y * vec.z - self.z * vec.y,
+      y: self.z * vec.x - self.x * vec.z,
+      z: self.x * vec.y - self.y * vec.x
+    }
   }
 
   pub fn random() -> Vector3 {
