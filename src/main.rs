@@ -81,20 +81,112 @@ pub fn render(scene: &Scene) -> DynamicImage {
   return image;
 }
 
+pub fn create_random_world() -> World {
+  let mut spheres = Vec::new();
+  // Ground
+  spheres.push(Sphere {
+    center: Vector3{x: 0.0, y: -1000.0, z: 0.0},
+    radius: 1000.0,
+    mat: Material { albedo: Vector3{x: 0.5, y: 0.5, z: 0.5}, surface: SurfaceType::Diffuse }
+  });
+
+  let mut rng = rand::thread_rng();
+
+  for a in -11..11 {
+    for b in -11..11 {
+      let choose_mat = rng.gen::<f64>();
+      let center = Vector3{
+        x: (a as f64) + 0.9 * rng.gen::<f64>(),
+        y: 0.2,
+        z: (b as f64) + 0.9 * rng.gen::<f64>()
+      };
+
+      if (center - Vector3{x: 4.0, y: 0.2, z: 0.0}).length() > 0.9 {
+        let sphere_material: Material;
+
+        // Diffuse
+        if choose_mat < 0.8 {
+          sphere_material = Material {
+            albedo: Vector3::random() * Vector3::random(),
+            surface: SurfaceType::Diffuse
+          };
+
+          spheres.push(Sphere {
+            center: center,
+            radius: 0.2,
+            mat: sphere_material
+          });
+        }
+
+        // Reflective
+        else if choose_mat < 0.95 {
+          sphere_material = Material {
+            albedo: Vector3::random_range(0.5, 1.0),
+            surface: SurfaceType::Reflective{ fuzz: rng.gen::<f64>() }
+          };
+
+          spheres.push(Sphere {
+            center: center,
+            radius: 0.2,
+            mat: sphere_material
+          });
+        }
+
+        // Refractive
+        else {
+          sphere_material = Material {
+            albedo: Vector3::zero(),
+            surface: SurfaceType::Refractive{ ref_idx: 1.5 }
+          };
+
+          spheres.push(Sphere {
+            center: center,
+            radius: 0.2,
+            mat: sphere_material
+          });
+        }
+      }
+    }
+  }
+
+  spheres.push(Sphere {
+    center: Vector3{x: 0.0, y: 1.0, z: 0.0},
+    radius: 1.0,
+    mat: Material{ albedo: Vector3::zero(), surface: SurfaceType::Refractive{ ref_idx: 1.5 } }
+  });
+
+  spheres.push(Sphere {
+    center: Vector3{x: -4.0, y: 1.0 , z: 0.0},
+    radius: 1.0,
+    mat: Material{ albedo: Vector3{x: 0.4, y: 0.2 , z: 0.1}, surface: SurfaceType::Diffuse }
+  });
+
+  spheres.push(Sphere {
+    center: Vector3{x: 4.0, y: 1.0 , z: 0.0},
+    radius: 1.0,
+    mat: Material{ albedo: Vector3{x: 0.7, y: 0.6 , z: 0.5}, surface: SurfaceType::Reflective{ fuzz: 0.0 } }
+  });
+
+  return World {
+    spheres: spheres
+  }
+}
+
 fn main() {
   // Image
   let image_info = ImageInfo {
-    aspect_ratio: 16.0 / 9.0,
-    width: 400,
-    height: 225,
-    samples_per_pixel: 100,
+    aspect_ratio: 3.0 / 2.0,
+    width: 1200,
+    height: 800,
+    samples_per_pixel: 500,
     max_depth: 50
   };
 
-  let lookfrom = Vector3{x: 3.0, y: 3.0, z: 2.0};
-  let lookat = Vector3{x: 0.0, y: 0.0, z: -1.0};
+  let lookfrom = Vector3{x: 13.0, y: 2.0, z: 3.0};
+  let lookat = Vector3{x: 0.0, y: 0.0, z: 0.0};
   let vup = Vector3{x: 0.0, y: 1.0, z: 0.0};
-  let dist_to_focus = (lookfrom - lookat).length();
+  let dist_to_focus = 10.0;
+  let aperture = 0.1;
 
   // Camera
   let camera = Camera::init(
@@ -103,42 +195,15 @@ fn main() {
     vup,
     20.0,
     image_info.aspect_ratio,
-    2.0,
+    aperture,
     dist_to_focus 
   );
-
-  let spheres = vec![
-    // Center
-    Sphere {
-      center: Vector3{x: 0.0, y: 0.0, z: -1.0},
-      radius: 0.5,
-      mat: Material { albedo: Vector3{x: 0.1, y: 0.2, z: 0.5}, surface: SurfaceType::Diffuse }
-    },
-    // Ground
-    Sphere {
-      center: Vector3{x: 0.0, y: -100.5, z: -1.0},
-      radius: 100.0,
-      mat: Material { albedo: Vector3{x: 0.8, y: 0.8, z: 0.0}, surface: SurfaceType::Diffuse }
-    },
-    // Left
-    Sphere {
-      center: Vector3{x: -1.0, y: 0.0, z: -1.0},
-      radius: 0.5,
-      mat: Material { albedo: Vector3::zero(), surface: SurfaceType::Refractive{ ref_idx: 1.5 } }
-    },
-    // Right
-    Sphere {
-      center: Vector3{x: 1.0, y: 0.0, z: -1.0},
-      radius: 0.5,
-      mat: Material { albedo: Vector3{x: 0.8, y: 0.6, z: 0.2}, surface: SurfaceType::Reflective{ fuzz: 0.0 } }
-    },
-  ];
 
   // Scene
   let scene = Scene {
     image_info: image_info,
     camera: camera,
-    world: World{spheres: spheres}
+    world: create_random_world()
   };
 
   // Render
