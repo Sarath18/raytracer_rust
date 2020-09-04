@@ -101,21 +101,25 @@ fn main() {
   camera.lower_left_corner = camera.origin - camera.horizonal/2.0 - camera.vertical/2.0 - Vector3{x: 0.0, y: 0.0, z: camera.focal_length};
 
   let spheres = vec![
+    // Center
     Sphere {
       center: Vector3{x: 0.0, y: 0.0, z: -1.0},
       radius: 0.5,
-      mat: Material { albedo: Vector3{x: 0.7, y: 0.3, z: 0.3}, surface: SurfaceType::Diffuse }
+      mat: Material { albedo: Vector3::zero(), surface: SurfaceType::Refractive{ ref_idx: 1.5 } }
     },
+    // Ground
     Sphere {
       center: Vector3{x: 0.0, y: -100.5, z: -1.0},
       radius: 100.0,
       mat: Material { albedo: Vector3{x: 0.8, y: 0.8, z: 0.0}, surface: SurfaceType::Diffuse }
     },
+    // Left
     Sphere {
       center: Vector3{x: -1.0, y: 0.0, z: -1.0},
       radius: 0.5,
-      mat: Material { albedo: Vector3{x: 0.8, y: 0.8, z: 0.8}, surface: SurfaceType::Reflective{ fuzz: 0.3 } }
+      mat: Material { albedo: Vector3::zero(), surface: SurfaceType::Refractive{ ref_idx: 1.5 } }
     },
+    // Right
     Sphere {
       center: Vector3{x: 1.0, y: 0.0, z: -1.0},
       radius: 0.5,
