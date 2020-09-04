@@ -91,13 +91,20 @@ fn main() {
     max_depth: 50
   };
 
+  let lookfrom = Vector3{x: 3.0, y: 3.0, z: 2.0};
+  let lookat = Vector3{x: 0.0, y: 0.0, z: -1.0};
+  let vup = Vector3{x: 0.0, y: 1.0, z: 0.0};
+  let dist_to_focus = (lookfrom - lookat).length();
+
   // Camera
   let camera = Camera::init(
-    Vector3{x: -2.0, y: 2.0, z: 1.0},
-    Vector3{x: 0.0, y: 0.0, z: -1.0},
-    Vector3{x: 0.0, y: 1.0, z: 0.0},
-    90.0,
-    image_info.aspect_ratio
+    lookfrom,
+    lookat,
+    vup,
+    20.0,
+    image_info.aspect_ratio,
+    2.0,
+    dist_to_focus 
   );
 
   let spheres = vec![

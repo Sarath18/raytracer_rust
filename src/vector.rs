@@ -172,4 +172,15 @@ impl Vector3 {
       z: z
     }
   }
+
+  pub fn random_in_unit_disk() -> Vector3 {
+    let mut rng = rand::thread_rng();
+    loop {
+      let p = Vector3{x: rng.gen_range(-1.0, 1.0), y: rng.gen_range(-1.0, 1.0), z: 0.0};
+      if p.norm() >= 1.0 {
+        continue;
+      }
+      return p;
+    }
+  }
 }

@@ -17,11 +17,15 @@ pub struct Camera {
   pub origin: Vector3,
   pub horizonal: Vector3,
   pub vertical: Vector3,
-  pub lower_left_corner: Vector3
+  pub lower_left_corner: Vector3,
+  pub u: Vector3,
+  pub v: Vector3,
+  pub w: Vector3,
+  pub lens_radius: f64
 }
 
 impl Camera {
-  pub fn init(lookfrom: Vector3, lookat: Vector3, vup: Vector3, vfov: f64, aspect_ratio: f64) -> Self {
+  pub fn init(lookfrom: Vector3, lookat: Vector3, vup: Vector3, vfov: f64, aspect_ratio: f64, aperture: f64, focus_dist: f64) -> Self {
     let theta = vfov.to_radians();
     let h = (theta/2.0).tan();
     let viewport_height = 2.0 * h;
@@ -32,9 +36,11 @@ impl Camera {
     let v = w.cross(u);
 
     let origin = lookfrom;
-    let horizonal = viewport_width * u;
-    let vertical = viewport_height * v;
-    let lower_left_corner = origin - horizonal/2.0 - vertical/2.0 - w;
+    let horizonal = focus_dist * viewport_width * u;
+    let vertical = focus_dist * viewport_height * v;
+    let lower_left_corner = origin - horizonal/2.0 - vertical/2.0 - focus_dist * w;
+
+    let lens_radius = aperture / 2.0;
     
     return Self {
       viewport_height: viewport_height,
@@ -42,14 +48,21 @@ impl Camera {
       origin: origin,
       horizonal: horizonal,
       vertical: vertical,
-      lower_left_corner: lower_left_corner
+      lower_left_corner: lower_left_corner,
+      u: u,
+      v: v,
+      w: w,
+      lens_radius: lens_radius
     };
   }
 
   pub fn get_ray(&self, s: &f64, t: &f64) -> Ray {
+    let rd = self.lens_radius * Vector3::random_in_unit_disk();
+    let offset = self.u * rd.x + self.v * rd.y;
+
     return Ray {
-      origin: self.origin,
-      direction: self.lower_left_corner + *s * self.horizonal + *t * self.vertical - self.origin
+      origin: self.origin + offset,
+      direction: self.lower_left_corner + *s * self.horizonal + *t * self.vertical - self.origin - offset
     };
   }
 }
