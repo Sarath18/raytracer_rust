@@ -114,12 +114,12 @@ fn main() {
     Sphere {
       center: Vector3{x: -1.0, y: 0.0, z: -1.0},
       radius: 0.5,
-      mat: Material { albedo: Vector3{x: 0.8, y: 0.8, z: 0.8}, surface: SurfaceType::Reflective }
+      mat: Material { albedo: Vector3{x: 0.8, y: 0.8, z: 0.8}, surface: SurfaceType::Reflective{ fuzz: 0.3 } }
     },
     Sphere {
       center: Vector3{x: 1.0, y: 0.0, z: -1.0},
       radius: 0.5,
-      mat: Material { albedo: Vector3{x: 0.8, y: 0.6, z: 0.2}, surface: SurfaceType::Reflective }
+      mat: Material { albedo: Vector3{x: 0.8, y: 0.6, z: 0.2}, surface: SurfaceType::Reflective{ fuzz: 1.0} }
     },
   ];
 

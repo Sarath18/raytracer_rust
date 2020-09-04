@@ -5,7 +5,7 @@ use crate::sphere::HitRecord;
 #[derive(Copy, Clone, Debug)]
 pub enum SurfaceType {
   Diffuse,
-  Reflective
+  Reflective { fuzz: f64 }
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -34,9 +34,10 @@ impl Material {
         *attenuation = self.albedo;
         return true;
       },
-      SurfaceType::Reflective => {
+      SurfaceType::Reflective { mut fuzz } => {
+        fuzz = if fuzz < 1.0 { fuzz } else { 1.0 };
         let reflected = reflect(Vector3::unit_vector(ray.direction), rec.normal);
-        *scattered = Ray{origin: rec.p, direction: reflected};
+        *scattered = Ray{origin: rec.p, direction: reflected + fuzz * Vector3::random_in_unit_sphere()};
         *attenuation = self.albedo;
         return scattered.direction.dot(rec.normal) > 0.0;
       }
