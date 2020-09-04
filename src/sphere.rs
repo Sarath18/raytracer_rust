@@ -1,12 +1,13 @@
 use crate::vector::Vector3;
 use crate::ray::Ray;
+use crate::material::Material;
 
-#[derive(Copy, Clone, Debug)]
 pub struct HitRecord {
   pub p: Vector3,
   pub normal: Vector3,
   pub t: f64,
-  pub front_face: bool
+  pub front_face: bool,
+  pub mat: Material
 }
 
 impl HitRecord {
@@ -15,7 +16,8 @@ impl HitRecord {
       p: Vector3::zero(),
       normal: Vector3::zero(),
       t: 0.0,
-      front_face: false
+      front_face: false,
+      mat: Material{albedo: Vector3::zero()}
     }
   }
 
@@ -28,7 +30,8 @@ impl HitRecord {
 #[derive(Copy, Clone, Debug)]
 pub struct Sphere {
   pub center: Vector3,
-  pub radius: f64
+  pub radius: f64,
+  pub mat: Material
 }
 
 impl Sphere {
@@ -49,6 +52,7 @@ impl Sphere {
         rec.p = ray.at(rec.t);
         let outward_normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(ray, outward_normal);
+        rec.mat = self.mat;
         return true;
       }
 
@@ -58,6 +62,7 @@ impl Sphere {
         rec.p = ray.at(rec.t);
         let outward_normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(ray, outward_normal);
+        rec.mat = self.mat;
         return true;
       }
     }

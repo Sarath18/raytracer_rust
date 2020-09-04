@@ -4,6 +4,7 @@ mod ray;
 mod scene;
 mod vector;
 mod sphere;
+mod material;
 
 use rand::Rng;
 use camera::{Camera, ImageInfo};
@@ -12,6 +13,7 @@ use image::{DynamicImage, GenericImage, Pixel, Rgba};
 use vector::Vector3;
 use ray::Ray;
 use sphere::{HitRecord, Sphere};
+use material::Material;
 
 pub fn ray_color(ray: &Ray, world: &World, depth: i32) -> Vector3 {
 
@@ -21,8 +23,13 @@ pub fn ray_color(ray: &Ray, world: &World, depth: i32) -> Vector3 {
 
   let mut rec = HitRecord::init();
   if world.hit(ray, 0.001, std::f64::INFINITY, &mut rec) {
-    let target = rec.p + rec.normal + Vector3::random_unit_vector();
-    return 0.5 * ray_color(&Ray{origin: rec.p, direction: target - rec.p}, world, depth - 1);
+    let mut scattered = Ray::init();
+    let mut attenuation = Vector3::zero();
+
+    if rec.mat.scatter(&ray, &rec, &mut attenuation, &mut scattered) {
+      return attenuation * ray_color(&scattered, world, depth - 1);
+    }
+    return Vector3::zero();
   }
 
   let unit_direction = Vector3::unit_vector(ray.direction);
@@ -67,9 +74,10 @@ pub fn render(scene: &Scene) -> DynamicImage {
       );
 
       image.put_pixel(x, scene.image_info.height -1 - y, color);
-      print!("Completed: {:.3}%\t\t\t\r", ((x + y * scene.image_info.width) as f64 / (scene.image_info.height * scene.image_info.width) as f64) * 100.0);
+      print!("Completed: {:.3}%\r", ((x + y * scene.image_info.width) as f64 / (scene.image_info.height * scene.image_info.width) as f64) * 100.0);
     }
   }
+  println!();
   return image;
 }
 
@@ -95,11 +103,13 @@ fn main() {
   let spheres = vec![
     Sphere {
       center: Vector3{x: 0.0, y: 0.0, z: -1.0},
-      radius: 0.5
+      radius: 0.5,
+      mat: Material { albedo: Vector3{x: 0.7, y: 0.3, z: 0.3} }
     },
     Sphere {
       center: Vector3{x: 0.0, y: -100.5, z: -1.0},
-      radius: 100.0
+      radius: 100.0,
+      mat: Material { albedo: Vector3{x: 0.8, y: 0.8, z: 0.0} }
     },
   ];
 

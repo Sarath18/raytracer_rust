@@ -10,4 +10,11 @@ impl Ray {
   pub fn at(&self, t: f64) -> Vector3 {
     return self.origin + t * self.direction;
   }
+
+  pub fn init() -> Self {
+    Self {
+      origin: Vector3::zero(),
+      direction: Vector3::zero()
+    }
+  }
 }
