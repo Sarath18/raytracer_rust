@@ -1,6 +1,7 @@
 use crate::vector::Vector3;
 use crate::ray::Ray;
 use crate::sphere::HitRecord;
+use rand::Rng;
 
 #[derive(Copy, Clone, Debug)]
 pub enum SurfaceType {
@@ -24,6 +25,12 @@ pub fn refract(uv: Vector3, n: Vector3, etai_over_etat: f64) -> Vector3 {
   let r_out_perp = etai_over_etat * (uv + cos_theta * n);
   let r_out_parallel = -(1.0 - r_out_perp.norm()).abs().sqrt() * n;
   return r_out_perp + r_out_parallel;
+}
+
+pub fn schlick(cosine: &f64, ref_idx: &f64) -> f64 {
+  let mut r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
+  r0 = r0 * r0;
+  return r0 + (1.0 - r0) * ((1.0 - cosine).powf(5.0));
 }
 
 impl Material {
@@ -63,6 +70,15 @@ impl Material {
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
         if etai_over_etat * sin_theta > 1.0 {
+          let reflected = reflect(unit_direction, rec.normal);
+          *scattered = Ray{origin: rec.p, direction: reflected};
+          return true;
+        }
+
+        let reflect_prob = schlick(&cos_theta, &etai_over_etat);
+
+        let mut rng = rand::thread_rng();
+        if rng.gen::<f64>() < reflect_prob {
           let reflected = reflect(unit_direction, rec.normal);
           *scattered = Ray{origin: rec.p, direction: reflected};
           return true;
