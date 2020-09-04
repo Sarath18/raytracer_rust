@@ -92,39 +92,49 @@ fn main() {
   };
 
   // Camera
-  let mut camera = Camera::init();
-  camera.viewport_height = 2.0;
-  camera.viewport_width = image_info.aspect_ratio * camera.viewport_height;
-  camera.focal_length = 1.0;
-  camera.horizonal = Vector3{x: camera.viewport_width, y: 0.0, z: 0.0};
-  camera.vertical = Vector3{x: 0.0, y: camera.viewport_height, z: 0.0};
-  camera.lower_left_corner = camera.origin - camera.horizonal/2.0 - camera.vertical/2.0 - Vector3{x: 0.0, y: 0.0, z: camera.focal_length};
+  let camera = Camera::init(90.0, image_info.aspect_ratio);
+
+  // let spheres = vec![
+  //   // Center
+  //   Sphere {
+  //     center: Vector3{x: 0.0, y: 0.0, z: -1.0},
+  //     radius: 0.5,
+  //     mat: Material { albedo: Vector3{x: 0.1, y: 0.2, z: 0.5}, surface: SurfaceType::Diffuse }
+  //   },
+  //   // Ground
+  //   Sphere {
+  //     center: Vector3{x: 0.0, y: -100.5, z: -1.0},
+  //     radius: 100.0,
+  //     mat: Material { albedo: Vector3{x: 0.8, y: 0.8, z: 0.0}, surface: SurfaceType::Diffuse }
+  //   },
+  //   // Left
+  //   Sphere {
+  //     center: Vector3{x: -1.0, y: 0.0, z: -1.0},
+  //     radius: 0.5,
+  //     mat: Material { albedo: Vector3::zero(), surface: SurfaceType::Refractive{ ref_idx: 1.5 } }
+  //   },
+  //   // Right
+  //   Sphere {
+  //     center: Vector3{x: 1.0, y: 0.0, z: -1.0},
+  //     radius: 0.5,
+  //     mat: Material { albedo: Vector3{x: 0.8, y: 0.6, z: 0.2}, surface: SurfaceType::Reflective{ fuzz: 0.0 } }
+  //   },
+  // ];
+  let radius = std::f64::consts::PI / 4.0;
 
   let spheres = vec![
     // Center
     Sphere {
-      center: Vector3{x: 0.0, y: 0.0, z: -1.0},
-      radius: 0.5,
-      mat: Material { albedo: Vector3{x: 0.1, y: 0.2, z: 0.5}, surface: SurfaceType::Diffuse }
+      center: Vector3{x: -radius, y: 0.0, z: -1.0},
+      radius: radius,
+      mat: Material { albedo: Vector3{x: 0.0, y: 0.0, z: 1.0}, surface: SurfaceType::Diffuse }
     },
     // Ground
     Sphere {
-      center: Vector3{x: 0.0, y: -100.5, z: -1.0},
-      radius: 100.0,
-      mat: Material { albedo: Vector3{x: 0.8, y: 0.8, z: 0.0}, surface: SurfaceType::Diffuse }
-    },
-    // Left
-    Sphere {
-      center: Vector3{x: -1.0, y: 0.0, z: -1.0},
-      radius: 0.5,
-      mat: Material { albedo: Vector3::zero(), surface: SurfaceType::Refractive{ ref_idx: 1.5 } }
-    },
-    // Right
-    Sphere {
-      center: Vector3{x: 1.0, y: 0.0, z: -1.0},
-      radius: 0.5,
-      mat: Material { albedo: Vector3{x: 0.8, y: 0.6, z: 0.2}, surface: SurfaceType::Reflective{ fuzz: 0.0 } }
-    },
+      center: Vector3{x: radius, y: 0.0, z: -1.0},
+      radius: radius,
+      mat: Material { albedo: Vector3{x: 1.0, y: 0.0, z: 0.0}, surface: SurfaceType::Diffuse }
+    }
   ];
 
   // Scene
