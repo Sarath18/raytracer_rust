@@ -1,5 +1,5 @@
 [package]
-name = "shadow_ball"
+name = "raytracer_rust"
 version = "0.1.0"
 authors = ["Sarathkrishnan Ramesh <sarathkrishnan99@gmail.com>"]
 edition = "2018"
